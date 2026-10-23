@@ -1,0 +1,22 @@
+import pandas as pd
+
+def coal_analysis(M_ad, VM_ad, ASH):
+    MM_ad = 1.1 * ASH
+    VM_dmf = (VM_ad * 100) / (100 - (M_ad + MM_ad))
+    return round(VM_dmf, 2)
+
+required_cols = ["M %", "VM %", "Ash %"]
+all_data = [data_1, data_2, data_3, data_4]
+
+
+for df in all_data:
+    if all(col in df.columns for col in required_cols):
+        df["VM_dmf"] = df.apply(
+            lambda row: coal_analysis(row["M %"], row["VM %"], row["Ash %"]), 
+            axis=1
+        )
+        display(df)
+        
+    else:
+        print("Use GCV data")
+        display(df)

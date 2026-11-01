@@ -1,0 +1,77 @@
+def classify_coal(row):
+    # Safely extract values without KeyError risk
+    fc = row.get("FC_dmf")
+    vm = row.get("VM_dmf")
+    gcv = row.get("GCV (MJ/kg)")
+
+    # Convert kcal/kg to MJ/kg if MJ/kg is missing but kcal/kg is present
+    if pd.isna(gcv) and "GCV (kcal/kg)" in row and pd.notna(row["GCV (kcal/kg)"]):
+        gcv = (row["GCV (kcal/kg)"] / 4.2) * 1e-3
+
+    # Classify Fixed Carbon (FC_dmf)
+    fc_class = None
+    if pd.notna(fc):
+        if fc >= 98:
+            fc_class = "Meta-anthracite"
+        elif 92 <= fc < 98:
+            fc_class = "Anthracite"
+        elif 86 <= fc < 92:
+            fc_class = "Semianthracite"
+        elif 78 <= fc < 86:
+            fc_class = "Low volatile bituminous coal"
+        elif 69 <= fc < 78:
+            fc_class = "Medium volatile bituminous coal"
+        elif fc < 69:
+            fc_class = "High volatile A bituminous coal"
+
+    # Classify Volatile Matter (VM_dmf)
+    vm_class = None
+    if pd.notna(vm):
+        if vm <= 2:
+            vm_class = "Meta-anthracite"
+        elif 2 < vm <= 8:
+            vm_class = "Anthracite"
+        elif 8 < vm <= 14:
+            vm_class = "Semianthracite"
+        elif 14 < vm <= 22:
+            vm_class = "Low volatile bituminous coal"
+        elif 22 < vm <= 31:
+            vm_class = "Medium volatile bituminous coal"
+        elif 31 < vm:
+            vm_class = "High volatile A bituminous coal"
+
+    # Compare FC and VM classifications (Conflict Resolution)
+    if fc_class and vm_class:
+        if fc_class == vm_class:
+            return fc_class  
+        else:
+            return f"{fc_class} to {vm_class}" 
+    elif fc_class:
+        return fc_class  
+    elif vm_class:
+        return vm_class  # Only VM within range
+
+    # 4. Fallback to GCV (MJ/kg) for lower-rank coals
+    if pd.notna(gcv):
+        if gcv >= 32.6:
+            return "High volatile A bituminous coal"
+        elif 30.2 <= gcv < 32.6:
+            return "High volatile B bituminous coal"
+        elif 26.7 <= gcv < 30.2:
+            return "High volatile C bituminous coal"
+        elif 24.4 <= gcv < 26.7:
+            return "Subbituminous A coal"
+        elif 22.1 <= gcv < 24.4:
+            return "Subbituminous B coal"
+        elif 19.3 <= gcv < 22.1:
+            return "Subbituminous C coal"
+        elif 14.7 <= gcv < 19.3:
+            return "Lignite A"
+        elif gcv < 14.7:
+            return "Lignite B"
+
+    return "Unknown / Missing Data"
+
+
+# Apply the classification function across the DataFrame
+data["Coal_Class"] = data.apply(classify_coal, axis=1)

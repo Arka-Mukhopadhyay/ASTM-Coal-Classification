@@ -49,7 +49,7 @@ def classify_coal(row):
     elif fc_class:
         return fc_class  
     elif vm_class:
-        return vm_class  # Only VM within range
+        return vm_class 
 
     # 4. Fallback to GCV (MJ/kg) for lower-rank coals
     if pd.notna(gcv):

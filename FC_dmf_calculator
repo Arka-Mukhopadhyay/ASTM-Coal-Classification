@@ -2,19 +2,19 @@ import pandas as pd
 
 required_cols = ["M %", "FC %", "Ash %"]
 
-if all(col in data_4.columns for col in required_cols):
+if all(col in data.columns for col in required_cols):
 
     def coal_analysis(M_ad, FC_ad, ASH):
         MM_ad = 1.1 * ASH
         FC_dmf = (FC_ad * 100) / (100 - (M_ad + MM_ad))
         return round(FC_dmf, 2)
         
-    data_4["FC_dmf"] = data_4.apply(
+    data_4["FC_dmf"] = data.apply(
         lambda row: coal_analysis(row["M %"], row["FC %"], row["Ash %"]), axis=1
     )
-    display(data_4)
+    display(data)
 
 else:
     print("Use GCV data")
-    display(data_4.head())
+    display(data.head())
     

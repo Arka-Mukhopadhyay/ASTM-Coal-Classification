@@ -6,10 +6,10 @@ if all(col in data_4.columns for col in required_cols):
 
     def coal_analysis(M_ad, FC_ad, ASH):
         MM_ad = 1.1 * ASH
-        C_dmf = (FC_ad * 100) / (100 - (M_ad + MM_ad))
-        return round(C_dmf, 2)
+        FC_dmf = (FC_ad * 100) / (100 - (M_ad + MM_ad))
+        return round(FC_dmf, 2)
         
-    data_4["C_dmf"] = data_4.apply(
+    data_4["FC_dmf"] = data_4.apply(
         lambda row: coal_analysis(row["M %"], row["FC %"], row["Ash %"]), axis=1
     )
     display(data_4)

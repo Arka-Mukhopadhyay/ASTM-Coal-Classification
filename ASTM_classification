@@ -6,8 +6,7 @@ def classify_coal(row):
 
     # Convert kcal/kg to MJ/kg if MJ/kg is missing but kcal/kg is present
     if pd.isna(gcv) and "GCV (kcal/kg)" in row and pd.notna(row["GCV (kcal/kg)"]):
-        gcv = (row["GCV (kcal/kg)"] / 4.2) * 1e-3
-
+        gcv = row["GCV (kcal/kg)"] * 0.004184
     # Classify Fixed Carbon (FC_dmf)
     fc_class = None
     if pd.notna(fc):
@@ -21,8 +20,7 @@ def classify_coal(row):
             fc_class = "Low volatile bituminous coal"
         elif 69 <= fc < 78:
             fc_class = "Medium volatile bituminous coal"
-        elif fc < 69:
-            fc_class = "High volatile A bituminous coal"
+
 
     # Classify Volatile Matter (VM_dmf)
     vm_class = None
@@ -37,8 +35,6 @@ def classify_coal(row):
             vm_class = "Low volatile bituminous coal"
         elif 22 < vm <= 31:
             vm_class = "Medium volatile bituminous coal"
-        elif 31 < vm:
-            vm_class = "High volatile A bituminous coal"
 
     # Compare FC and VM classifications (Conflict Resolution)
     if fc_class and vm_class:
@@ -51,7 +47,7 @@ def classify_coal(row):
     elif vm_class:
         return vm_class  # Only VM within range
 
-    # 4. Fallback to GCV (MJ/kg) for lower-rank coals
+    # Fallback to GCV (MJ/kg) for lower-rank coals
     if pd.notna(gcv):
         if gcv >= 32.6:
             return "High volatile A bituminous coal"
